@@ -1,0 +1,25 @@
+@startuml
+actor User
+entity "Redis (Cache)" as Cache
+entity "MES DB" as DB
+entity "MES" as App
+
+User -> App: Запрос списка заказов
+App -> Cache: Проверка кэша
+Cache --> App: Список найден в кэше?
+alt Список найден
+    App -> User: Вернуть список из кэша
+else
+    App -> DB: Получить список заказов
+    DB --> App: Вернуть данные
+    App -> Cache: Сохранить данные в кэше
+    App -> User: Вернуть список заказов
+end
+
+User -> App: Изменение статуса заказа
+App -> DB: Обновление данных заказа
+App -> Cache: Обновление/Удаление кэшированных данных
+DB --> App: Подтверждение
+App -> User: Подтверждение обновления
+
+@enduml
